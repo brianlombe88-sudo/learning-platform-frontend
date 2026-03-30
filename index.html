@@ -18,6 +18,12 @@
 <input id="loginPassword" placeholder="Password"><br>
 <button onclick="login()">Login</button>
 
+<h2>Create Course (Tutor Only)</h2>
+<input id="title" placeholder="Course Title"><br>
+<input id="description" placeholder="Description"><br>
+<input id="price" placeholder="Price"><br>
+<button onclick="createCourse()">Create Course</button>
+
 <h2>Courses</h2>
 <button onclick="getCourses()">Load Courses</button>
 <ul id="courses"></ul>
@@ -32,10 +38,11 @@ async function register() {
     body: JSON.stringify({
       name: document.getElementById("name").value,
       email: document.getElementById("email").value,
-      password: document.getElementById("password").value
+      password: document.getElementById("password").value,
+      role: "tutor"
     })
   });
-  alert("Registered!");
+  alert("Registered as tutor!");
 }
 
 async function login() {
@@ -51,6 +58,29 @@ async function login() {
   const data = await res.json();
   localStorage.setItem("token", data.token);
   alert("Logged in!");
+}
+
+async function createCourse() {
+  const token = localStorage.getItem("token");
+
+  const res = await fetch(API + "/courses", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": token
+    },
+    body: JSON.stringify({
+      title: document.getElementById("title").value,
+      description: document.getElementById("description").value,
+      price: Number(document.getElementById("price").value)
+    })
+  });
+
+  if (res.status === 403) {
+    alert("Only tutors can create courses");
+  } else {
+    alert("Course created!");
+  }
 }
 
 async function getCourses() {
