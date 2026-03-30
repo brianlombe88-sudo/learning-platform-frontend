@@ -92,9 +92,37 @@ async function getCourses() {
 
   courses.forEach(c => {
     const li = document.createElement("li");
-    li.innerText = c.title + " - $" + c.price;
+
+    const text = document.createElement("span");
+    text.innerText = c.title + " - $" + c.price;
+
+    const btn = document.createElement("button");
+    btn.innerText = "Buy";
+    btn.onclick = () => buyCourse(c._id);
+
+    li.appendChild(text);
+    li.appendChild(document.createElement("br"));
+    li.appendChild(btn);
+
     list.appendChild(li);
   });
+}
+
+async function buyCourse(courseId) {
+  const token = localStorage.getItem("token");
+
+  const res = await fetch(API + "/create-checkout-session", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": token
+    },
+    body: JSON.stringify({ courseId })
+  });
+
+  const data = await res.json();
+
+  window.location.href = data.url;
 }
 </script>
 
