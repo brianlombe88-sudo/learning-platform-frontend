@@ -5,9 +5,9 @@
 </head>
 <body>
 
-<h1>Welcome to Learning Platform</h1>
+<h1>Learning Platform</h1>
 
-<h2>Register</h2>
+<h2>Register (Tutor)</h2>
 <input id="name" placeholder="Name"><br>
 <input id="email" placeholder="Email"><br>
 <input id="password" placeholder="Password"><br>
@@ -18,7 +18,7 @@
 <input id="loginPassword" placeholder="Password"><br>
 <button onclick="login()">Login</button>
 
-<h2>Create Course (Tutor Only)</h2>
+<h2>Create Course</h2>
 <input id="title" placeholder="Course Title"><br>
 <input id="description" placeholder="Description"><br>
 <input id="price" placeholder="Price"><br>
@@ -42,7 +42,7 @@ async function register() {
       role: "tutor"
     })
   });
-  alert("Registered as tutor!");
+  alert("Registered!");
 }
 
 async function login() {
@@ -63,7 +63,7 @@ async function login() {
 async function createCourse() {
   const token = localStorage.getItem("token");
 
-  const res = await fetch(API + "/courses", {
+  await fetch(API + "/courses", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -76,11 +76,7 @@ async function createCourse() {
     })
   });
 
-  if (res.status === 403) {
-    alert("Only tutors can create courses");
-  } else {
-    alert("Course created!");
-  }
+  alert("Course created!");
 }
 
 async function getCourses() {
@@ -93,16 +89,10 @@ async function getCourses() {
   courses.forEach(c => {
     const li = document.createElement("li");
 
-    const text = document.createElement("span");
-    text.innerText = c.title + " - $" + c.price;
-
-    const btn = document.createElement("button");
-    btn.innerText = "Buy";
-    btn.onclick = () => buyCourse(c._id);
-
-    li.appendChild(text);
-    li.appendChild(document.createElement("br"));
-    li.appendChild(btn);
+    li.innerHTML = `
+      <strong>${c.title}</strong> - $${c.price} <br>
+      <button onclick="buyCourse('${c._id}')">Buy</button>
+    `;
 
     list.appendChild(li);
   });
@@ -122,7 +112,11 @@ async function buyCourse(courseId) {
 
   const data = await res.json();
 
-  window.location.href = data.url;
+  if (data.url) {
+    window.location.href = data.url;
+  } else {
+    alert("Payment not set up yet");
+  }
 }
 </script>
 
